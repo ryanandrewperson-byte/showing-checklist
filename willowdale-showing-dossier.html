@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Showing Dossier — 3525 Willowdale Rd</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1511;
+    --walnut:#5b4329;
+    --bronze:#a8743c;
+    --bronze-deep:#8c5d2c;
+    --rust:#9c4527;
+    --cream:#ece3d3;
+    --paper:#f4eee1;
+    --paper-2:#f8f3e8;
+    --line:#d9cdb6;
+    --muted:#857358;
+    --good:#5e6b3b;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(168,116,60,.06), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(91,67,41,.05), transparent 45%),
+      var(--cream);
+    color:var(--ink);
+    font-family:'Manrope',system-ui,sans-serif;
+    line-height:1.5;
+    padding:0 0 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:780px;margin:0 auto;padding:0 18px;}
+
+  /* ---- Header ---- */
+  header{padding:30px 0 18px;border-bottom:1px solid var(--line);}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--bronze-deep);font-weight:500;margin:0 0 12px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:clamp(30px,7vw,46px);line-height:1.04;
+    letter-spacing:-.01em;margin:0 0 4px;
+  }
+  h1 .st{display:block;font-size:.5em;font-weight:500;color:var(--walnut);letter-spacing:0;margin-top:6px;}
+  .facts{
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--walnut);
+    display:flex;flex-wrap:wrap;gap:6px 14px;margin:16px 0 4px;
+  }
+  .facts b{color:var(--ink);font-weight:600;}
+  .pricetag{
+    margin:16px 0 0;padding:11px 14px;border-radius:9px;
+    background:linear-gradient(180deg,#fbf6ec,#f4ecdb);
+    border:1px solid var(--line);border-left:3px solid var(--rust);
+    font-size:13.5px;color:var(--walnut);
+  }
+  .pricetag b{color:var(--ink);}
+
+  /* ---- Progress ---- */
+  .progress-rail{
+    position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg,var(--cream) 70%,rgba(236,227,211,0));
+    padding:12px 0 14px;margin-top:0;
+  }
+  .pbar{height:7px;border-radius:5px;background:#ddd1bb;overflow:hidden;border:1px solid var(--line);}
+  .pfill{height:100%;width:0;background:linear-gradient(90deg,var(--bronze),var(--bronze-deep));transition:width .35s ease;}
+  .pmeta{display:flex;justify-content:space-between;align-items:baseline;margin-top:7px;}
+  .pmeta .lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  .pmeta .cnt{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--bronze-deep);}
+
+  /* ---- Sections ---- */
+  .section{
+    border:1px solid var(--line);border-radius:12px;margin:14px 0;overflow:hidden;
+    background:var(--paper);
+  }
+  .sec-head{
+    display:flex;align-items:center;gap:13px;padding:16px 16px;cursor:pointer;
+    user-select:none;
+  }
+  .sec-num{
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;
+    color:var(--bronze-deep);border:1px solid var(--bronze);border-radius:6px;
+    padding:3px 7px;flex:none;letter-spacing:.05em;
+  }
+  .sec-title{font-family:'Fraunces',serif;font-weight:600;font-size:19px;flex:1;line-height:1.15;}
+  .sec-prog{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);flex:none;}
+  .chev{flex:none;width:18px;height:18px;transition:transform .25s;color:var(--walnut);}
+  .section.open .chev{transform:rotate(90deg);}
+  .sec-body{display:none;padding:2px 16px 8px;border-top:1px solid var(--line);}
+  .section.open .sec-body{display:block;}
+  .sec-tag{
+    font-size:12.5px;color:var(--muted);font-style:italic;
+    margin:12px 2px 4px;
+  }
+
+  /* ---- Items ---- */
+  .item{
+    display:flex;gap:12px;padding:13px 2px;border-bottom:1px solid rgba(217,205,182,.55);
+    align-items:flex-start;
+  }
+  .item:last-child{border-bottom:none;}
+  .box{
+    flex:none;width:24px;height:24px;border:2px solid var(--bronze);border-radius:6px;
+    margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:all .15s;background:var(--paper-2);
+  }
+  .box svg{width:15px;height:15px;opacity:0;transform:scale(.5);transition:all .15s;color:#fff;}
+  .item.done .box{background:var(--bronze);border-color:var(--bronze);}
+  .item.done .box svg{opacity:1;transform:scale(1);}
+  .it-main{flex:1;min-width:0;}
+  .it-label{font-size:15px;font-weight:600;color:var(--ink);line-height:1.35;cursor:pointer;}
+  .item.done .it-label{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(133,115,88,.5);}
+  .it-sub{font-size:13px;color:var(--walnut);margin-top:3px;line-height:1.4;}
+  .item.done .it-sub{opacity:.5;}
+  .notebtn{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;
+    color:var(--bronze-deep);background:none;border:none;padding:6px 0 0;cursor:pointer;
+    text-transform:uppercase;
+  }
+  .note{
+    width:100%;margin-top:8px;border:1px solid var(--line);border-radius:7px;
+    background:var(--paper-2);padding:8px 10px;font-family:'Manrope',sans-serif;
+    font-size:13.5px;color:var(--ink);resize:vertical;min-height:38px;display:none;
+  }
+  .note.show{display:block;}
+  .note:focus{outline:none;border-color:var(--bronze);}
+
+  /* flag + question variants */
+  .section.flag{background:linear-gradient(180deg,#f7ece1,#f4e7d8);border-color:#e0c4a6;}
+  .section.flag .sec-num{color:var(--rust);border-color:var(--rust);}
+  .section.flag .box{border-color:var(--rust);}
+  .section.flag .item.done .box{background:var(--rust);border-color:var(--rust);}
+  .section.flag .sec-title::after{content:" ⚑";color:var(--rust);font-size:.8em;}
+
+  .section.ask .sec-num{color:var(--walnut);border-color:var(--walnut);}
+  .section.ask .it-label::before{content:"“ ";color:var(--bronze);font-family:'Fraunces',serif;}
+  .section.ask .it-label::after{content:" ”";color:var(--bronze);font-family:'Fraunces',serif;}
+
+  /* ---- Gut check ---- */
+  .gut{border:1px solid var(--bronze);border-radius:14px;padding:20px 18px;margin:22px 0 8px;background:linear-gradient(180deg,var(--paper-2),var(--paper));}
+  .gut h2{font-family:'Fraunces',serif;font-weight:600;font-size:23px;margin:0 0 4px;}
+  .gut .lead{font-size:13.5px;color:var(--walnut);margin:0 0 18px;}
+  .dial{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 18px;}
+  .dial button{
+    flex:1;min-width:38px;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;
+    padding:11px 0;border:1px solid var(--line);border-radius:8px;background:var(--paper-2);
+    color:var(--walnut);cursor:pointer;transition:all .12s;
+  }
+  .dial button.on{background:var(--bronze);color:#fff;border-color:var(--bronze);transform:translateY(-1px);}
+  .verdict{display:flex;gap:8px;margin:6px 0 16px;}
+  .verdict button{
+    flex:1;font-family:'Manrope',sans-serif;font-weight:600;font-size:14px;padding:13px 6px;
+    border:1px solid var(--line);border-radius:9px;background:var(--paper-2);color:var(--walnut);cursor:pointer;transition:all .12s;
+  }
+  .verdict button.on[data-v="love"]{background:var(--good);color:#fff;border-color:var(--good);}
+  .verdict button.on[data-v="maybe"]{background:var(--bronze);color:#fff;border-color:var(--bronze);}
+  .verdict button.on[data-v="pass"]{background:var(--rust);color:#fff;border-color:var(--rust);}
+  .gutlabel{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 7px;}
+  .bigtext{width:100%;border:1px solid var(--line);border-radius:9px;background:var(--paper-2);padding:11px 12px;font-family:'Manrope',sans-serif;font-size:14px;color:var(--ink);min-height:80px;resize:vertical;}
+  .bigtext:focus{outline:none;border-color:var(--bronze);}
+
+  /* ---- Footer ---- */
+  .foot{display:flex;gap:10px;margin:26px 0 0;}
+  .foot button{
+    flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+    padding:13px;border-radius:9px;border:1px solid var(--line);background:var(--paper);color:var(--walnut);cursor:pointer;
+  }
+  .foot button:active{transform:scale(.98);}
+  .saved{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:center;margin-top:14px;letter-spacing:.08em;}
+
+  @media print{
+    .progress-rail,.foot,.notebtn,.chev{display:none;}
+    .sec-body{display:block!important;}
+    body{background:#fff;}
+    .section{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Showing Dossier · Sat · 11:00 AM</p>
+    <h1>3525 Willowdale Rd<span class="st">Historic Wildwood Park · Fort Wayne 46802</span></h1>
+    <div class="facts">
+      <span><b>4</b> bd</span><span><b>3</b> ba</span><span><b>3,018</b> sqft</span>
+      <span><b>0.44</b> ac</span><span>built <b>1940</b></span><span>Colonial</span>
+    </div>
+    <div class="pricetag">
+      Listed <b>$464,900</b> · Zestimate <b>$443,500</b> ($421k–$466k) · Went <b>pending at $349,900</b> in Nov 2025, fell through, relisted +33% after ~$83k of mostly-cosmetic work. <b>You're touring a freshened flip — hunt for what got covered up.</b>
+    </div>
+  </header>
+
+  <div class="progress-rail">
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+    <div class="pmeta">
+      <span class="lbl">Walkthrough progress</span>
+      <span class="cnt" id="pcnt">0 / 0</span>
+    </div>
+  </div>
+
+  <div id="sections"></div>
+
+  <div class="gut">
+    <h2>Gut check</h2>
+    <p class="lead">Do this last, standing in the driveway before you drive off — while it's fresh.</p>
+    <div class="gutlabel">Does it feel like home? (1 = nope · 10 = yes)</div>
+    <div class="dial" id="dial"></div>
+    <div class="gutlabel">Verdict</div>
+    <div class="verdict" id="verdict">
+      <button data-v="love">Love it</button>
+      <button data-v="maybe">Maybe</button>
+      <button data-v="pass">Pass</button>
+    </div>
+    <div class="gutlabel">What I loved / what gave me pause</div>
+    <textarea class="bigtext" id="summary" placeholder="First reaction walking in… the rooms that worked… anything that felt off… what I'd need to confirm before offering."></textarea>
+  </div>
+
+  <div class="foot">
+    <button id="printBtn">Print / Save PDF</button>
+    <button id="resetBtn">Reset all</button>
+  </div>
+  <div class="saved" id="savedNote">Your checks & notes save automatically</div>
+
+</div>
+
+<script>
+const DATA = [
+  {n:"01", title:"First impression & exterior", kind:"check",
+   tag:"You'll form a verdict in the first 90 seconds — log it before the listing copy talks you out of it.",
+   items:[
+     {l:"Standing-seam steel roof (2018)", s:"Scan for oil-canning, lifted seams, sagging ridgeline. This is a lifetime roof — confirm it actually looks tight."},
+     {l:"Gutters, downspouts & grading", s:"Lot is sloped. Water should run AWAY from the house. Note where downspouts and the sump discharge dump."},
+     {l:"Vinyl siding (2018) & trim", s:"Look behind shrubs and at corners for buckling, gaps, or rot underneath."},
+     {l:"Foundation walls (outside)", s:"Walk the full perimeter. Step cracks, bowing, fresh patching, or parging that hides something."},
+     {l:"Windows — replaced or just 'maintained'?", s:"Listing says 'maintenance & repair,' not replacement. Check for fog between panes (failed seals) and that each one opens/locks."},
+     {l:"Whole-home generator (2018)", s:"Confirm it's there and ask: last serviced when, and does it truly power the whole house?"},
+     {l:"Garage (2.5-car, asphalt)", s:"Doors open/close smoothly, no cracks in the slab, enough depth/height for your gear."},
+     {l:"Driveway & hardscape", s:"Asphalt condition, cracks, settling near the house."},
+     {l:"Mature trees / canopy", s:"Beautiful, but = gutter load and roots near the foundation and sewer line. Note any leaning over the roof."}
+   ]},
+
+  {n:"02", title:"Basement & water — the big one", kind:"check",
+   tag:"There's a sump pump WITH battery backup and brand-new 2026 basement flooring. That combo means water has been a story here. Spend real time down here.",
+   items:[
+     {l:"Smell test the second you walk down", s:"Musty / earthy / 'finished-basement candle' smell = moisture being masked. Trust your nose."},
+     {l:"Why the sump + battery backup?", s:"Ask directly: has this basement ever taken on water? How often does the pump run?"},
+     {l:"Walls: efflorescence & staining", s:"White chalky residue or water lines on concrete = past intrusion. Check behind/under the finished areas if you can."},
+     {l:"New 2026 basement flooring", s:"Freshly redone right before listing. Is it covering a stain or a soft spot? Press for spongy areas."},
+     {l:"Floor cracks & sump pit", s:"Look at the pit — is there standing water? Does the pump cycle? Cracks radiating from corners?"},
+     {l:"Basement wood-burning fireplace", s:"Unusual. Check the flue/damper and for smoke staining."},
+     {l:"Rust at the base of anything metal", s:"Water heater, furnace stand, appliances — rust low to the floor is a flood tell."}
+   ]},
+
+  {n:"03", title:"Mechanicals & systems", kind:"check",
+   tag:"Roof/furnace/generator are handled. The 1940-era unknowns are wiring, plumbing, and the sewer — that's where old houses bite.",
+   items:[
+     {l:"Furnace — Ducane (2026)", s:"New. Ask for the install receipt / warranty and whether it transfers."},
+     {l:"Central A/C age", s:"Furnace is new; the AC may not be. Find the condenser, check the date sticker."},
+     {l:"Gas water heater age", s:"Look for the manufacture date. 10+ yrs = budget to replace."},
+     {l:"Electrical panel", s:"1940 house — is it a modern breaker panel? What amperage (100 vs 200)? Any fuses, knob-and-tube, or cloth wiring still live? Ask if it was updated."},
+     {l:"Grounded & GFCI outlets", s:"3-prong outlets that are actually grounded; GFCIs in kitchen/baths. Bring a cheap outlet tester or just note older 2-prong runs."},
+     {l:"Plumbing supply lines", s:"Galvanized (1940-typical, corrodes) vs copper/PEX? Run faucets — weak pressure hints at old galvanized."},
+     {l:"Sewer lateral history", s:"For the inspector to scope later — but ask the seller now: any backups, root issues, or line work?"},
+     {l:"Two wood-burning fireplaces", s:"When were the chimneys last swept/inspected? Liners intact? Dampers work?"}
+   ]},
+
+  {n:"04", title:"Interior — room by room", kind:"check",
+   tag:"Walk it slowly. Open everything. The flip work is cosmetic, so judge the quality, not just the freshness.",
+   items:[
+     {l:"Confirm the layout: where are all 4 bedrooms?", s:"Listing shows 2 'upper' bedrooms + a main-level office. Verify the real bed count and where the master suite sits."},
+     {l:"Floors — level & solid", s:"Old houses settle. Note slopes, bounce, or gaps. Roll a marble if you brought one (only half-joking)."},
+     {l:"Walls & ceilings", s:"Cracks at door corners (settling) and water stains on ceilings (roof/plumbing leaks). Watch for paint touched up in just one spot."},
+     {l:"Kitchen remodel (2026) quality", s:"Run the faucet, check under the sink for leaks, open every cabinet/drawer for alignment, test the gas range. Flip-grade or solid?"},
+     {l:"All 2.5 baths (updated 2026)", s:"Water pressure, drain speed, exhaust fans, fresh caulk vs hiding leaks. Look under every vanity."},
+     {l:"Master suite, walk-in & cedar closet", s:"Confirm the en-suite, closet size, and that it feels like the retreat the listing promises."},
+     {l:"Run multiple fixtures at once", s:"Flush a toilet while a sink runs — pressure that craters confirms old supply lines."},
+     {l:"Appliances included", s:"Listing includes fridge, washer, dryer, dishwasher, microwave, range, disposal, ice maker. Confirm all present & working."},
+     {l:"Natural light & orientation", s:"Which way does it face? Where does morning light land? (Matters for you.)"}
+   ]},
+
+  {n:"05", title:"Layout & livability — does it fit YOU?", kind:"check",
+   tag:"This is the part the financial spreadsheet can't answer. Be honest about the feel.",
+   items:[
+     {l:"Does the flow actually work?", s:"Forget the staging — can you picture your daily life moving through these rooms?"},
+     {l:"Home gym space", s:"Where does the BikeErg / assault runner / climbing setup go? The finished basement could be it — check ceiling height and floor for equipment."},
+     {l:"The 'spa' (listed as private)", s:"Find out what it actually is, where, condition, and whether it conveys."},
+     {l:"Home theater equipment", s:"Listed as on-site — does it stay? What condition?"},
+     {l:"Yard usability (0.44 ac, sloped)", s:"How much is flat, usable space vs slope? Privacy from neighbors?"},
+     {l:"Storage & closets", s:"Old houses run short on closets. Is there enough, plus garage/basement storage?"},
+     {l:"Cell signal inside", s:"Metal roof + old construction can kill reception. Check bars in a few rooms."},
+     {l:"Noise", s:"Stand still and listen — street, neighbors, HVAC. This is a quieter SW pocket; confirm it."},
+     {l:"The woodland / dark-luxe vibe", s:"Can this house become the aesthetic you actually want, or are you fighting it?"}
+   ]},
+
+  {n:"06", title:"Neighborhood & location", kind:"check",
+   tag:"You're moving from a walkable downtown condo to a car-dependent SW pocket (Walk Score 39). Make sure that trade lands for you.",
+   items:[
+     {l:"Street & neighbor homes", s:"Wildwood Park is architect-designed and well-kept per the listing — confirm the immediate neighbors match that."},
+     {l:"Commute test", s:"Roughly time the drive to work / downtown from the driveway."},
+     {l:"Proximity perks", s:"Jefferson Pointe shopping, Buckner Park & Aboite Trails, Canterbury nearby — worth a quick drive-by after."},
+     {l:"Flood / drainage at the block", s:"Sloped lot + sump = check the FEMA flood map for the parcel and eyeball low spots on the street."},
+     {l:"Historic district rules?", s:"'Historic Wildwood Park' may carry exterior-change restrictions. Ask if renovations/additions need approval."}
+   ]},
+
+  {n:"07", title:"Questions to keep the agent honest", kind:"ask",
+   tag:"Ask these out loud and watch how cleanly they answer.",
+   items:[
+     {l:"Why did the Nov 2025 pending sale at $349,900 fall through?", s:"Inspection, financing, or appraisal — each one is your business."},
+     {l:"What comps justify $464,900 when the Zestimate is $443,500?", s:"Make them defend the 33% jump."},
+     {l:"How many offers / how much current interest?", s:"13 days, 1,600+ views, no contract yet. Gauge your leverage."},
+     {l:"What's the seller's motivation and timeline?", s:"Flipper wanting a quick close = room to negotiate."},
+     {l:"Were permits pulled for the 2026 work?", s:"Unpermitted kitchen/electrical work becomes your liability."},
+     {l:"Licensed contractors? Any transferable warranties?", s:"On the roof, furnace, generator especially."},
+     {l:"Can I see the seller's disclosure?", s:"Indiana Seller's Residential Real Estate Disclosure — read every 'yes.'"},
+     {l:"12 months of utility bills (NIPSCO gas, electric, water)?", s:"Old 3,000 sqft house — heating cost is real. Get the numbers."},
+     {l:"What does the $105/yr HOA cover, and the covenants?", s:"Confirm the low fee and any restrictions."}
+   ]},
+
+  {n:"08", title:"Red flags to actively hunt", kind:"flag",
+   tag:"A pre-listing cosmetic flip is exactly when corners get cut and stains get covered. Go looking on purpose.",
+   items:[
+     {l:"Paint touched up in only certain spots", s:"A single repainted patch on a ceiling/wall = something was there."},
+     {l:"Brand-new flooring over a problem", s:"Especially the 2026 basement floor. Soft, uneven, or smells off."},
+     {l:"Fogged / failed window seals", s:"'Maintained' windows that weren't actually replaced."},
+     {l:"Flip-grade finish quality", s:"Sloppy caulk, misaligned cabinets, cheap fixtures = where else did they cut?"},
+     {l:"Smell-masking", s:"Plug-ins, candles, fresh paint smell stacked together. What's underneath?"},
+     {l:"Doors that won't latch / uneven floors", s:"Structural settling the cosmetics can't hide."}
+   ]},
+
+  {n:"09", title:"Bring & do", kind:"check",
+   tag:"Quick prep so you're not relying on memory afterward.",
+   items:[
+     {l:"Photo + video everything", s:"Especially the basement, panel, water heater, any flaw — your inspector will want it."},
+     {l:"Phone flashlight", s:"Basement corners, attic access, under sinks, the panel."},
+     {l:"Test every appliance, faucet, toilet, window, door", s:"If you can touch it, operate it."},
+     {l:"Grab the seller's disclosure on the way out", s:"Paper or digital — don't leave without it."},
+     {l:"Note anything for the inspector", s:"Use the gut-check box below to dump everything before you drive off."}
+   ]}
+];
+
+// ---- State + storage ----
+const KEY='willowdale_showing_v1';
+let state={checks:{},notes:{},open:{},feel:null,verdict:null,summary:''};
+const hasStore = (typeof window!=='undefined' && window.storage && typeof window.storage.get==='function');
+
+async function load(){
+  if(!hasStore) return;
+  try{ const r=await window.storage.get(KEY); if(r&&r.value){ state=Object.assign(state,JSON.parse(r.value)); } }catch(e){}
+}
+let t;
+function save(){
+  if(!hasStore) return;
+  clearTimeout(t);
+  t=setTimeout(async()=>{ try{ await window.storage.set(KEY,JSON.stringify(state)); flashSaved(); }catch(e){} },400);
+}
+function flashSaved(){
+  const n=document.getElementById('savedNote');
+  n.textContent='Saved ✓'; n.style.color='var(--good)';
+  setTimeout(()=>{ n.textContent='Your checks & notes save automatically'; n.style.color='var(--muted)'; },1100);
+}
+
+const CHK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+const CHEV='<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+
+function totals(){
+  let total=0,done=0;
+  DATA.forEach((s,si)=>s.items.forEach((it,ii)=>{ total++; if(state.checks[si+'-'+ii]) done++; }));
+  return {total,done};
+}
+function updateProgress(){
+  const {total,done}=totals();
+  document.getElementById('pcnt').textContent=done+' / '+total;
+  document.getElementById('pfill').style.width=(total? (done/total*100):0)+'%';
+}
+function secProg(si){
+  let d=0; DATA[si].items.forEach((it,ii)=>{ if(state.checks[si+'-'+ii]) d++; });
+  return d+'/'+DATA[si].items.length;
+}
+
+function render(){
+  const root=document.getElementById('sections');
+  root.innerHTML='';
+  DATA.forEach((sec,si)=>{
+    const open = state.open[si] ?? (si===0||si===1||si===7);
+    const div=document.createElement('div');
+    div.className='section'+(open?' open':'')+(sec.kind==='flag'?' flag':'')+(sec.kind==='ask'?' ask':'');
+    div.innerHTML=
+      '<div class="sec-head" data-sec="'+si+'">'+
+        '<span class="sec-num">'+sec.n+'</span>'+
+        '<span class="sec-title">'+sec.title+'</span>'+
+        '<span class="sec-prog" id="sp-'+si+'">'+secProg(si)+'</span>'+CHEV+
+      '</div>'+
+      '<div class="sec-body">'+
+        (sec.tag?'<p class="sec-tag">'+sec.tag+'</p>':'')+
+        sec.items.map((it,ii)=>{
+          const id=si+'-'+ii, done=!!state.checks[id], note=state.notes[id]||'';
+          return '<div class="item'+(done?' done':'')+'" id="item-'+id+'">'+
+            '<div class="box" data-chk="'+id+'">'+CHK+'</div>'+
+            '<div class="it-main">'+
+              '<div class="it-label" data-chk="'+id+'">'+it.l+'</div>'+
+              (it.s?'<div class="it-sub">'+it.s+'</div>':'')+
+              '<button class="notebtn" data-note="'+id+'">'+(note?'✎ edit note':'+ add note')+'</button>'+
+              '<textarea class="note'+(note?' show':'')+'" data-noteinput="'+id+'" placeholder="Notes…">'+note+'</textarea>'+
+            '</div>'+
+          '</div>';
+        }).join('')+
+      '</div>';
+    root.appendChild(div);
+  });
+  bind();
+  updateProgress();
+}
+
+function bind(){
+  document.querySelectorAll('.sec-head').forEach(h=>{
+    h.onclick=()=>{ const si=h.dataset.sec; const sec=h.closest('.section'); sec.classList.toggle('open'); state.open[si]=sec.classList.contains('open'); save(); };
+  });
+  document.querySelectorAll('[data-chk]').forEach(el=>{
+    el.onclick=(e)=>{ e.stopPropagation(); const id=el.dataset.chk; state.checks[id]=!state.checks[id];
+      const item=document.getElementById('item-'+id); item.classList.toggle('done',state.checks[id]);
+      const si=id.split('-')[0]; document.getElementById('sp-'+si).textContent=secProg(si);
+      updateProgress(); save(); };
+  });
+  document.querySelectorAll('[data-note]').forEach(btn=>{
+    btn.onclick=()=>{ const id=btn.dataset.note; const ta=document.querySelector('[data-noteinput="'+id+'"]'); ta.classList.toggle('show'); if(ta.classList.contains('show')) ta.focus(); };
+  });
+  document.querySelectorAll('[data-noteinput]').forEach(ta=>{
+    ta.oninput=()=>{ const id=ta.dataset.noteinput; state.notes[id]=ta.value;
+      const btn=document.querySelector('[data-note="'+id+'"]'); btn.textContent=ta.value?'✎ edit note':'+ add note'; save(); };
+  });
+}
+
+// gut check
+function buildGut(){
+  const dial=document.getElementById('dial');
+  for(let i=1;i<=10;i++){ const b=document.createElement('button'); b.textContent=i; b.dataset.feel=i;
+    if(state.feel==i) b.classList.add('on');
+    b.onclick=()=>{ state.feel=i; document.querySelectorAll('#dial button').forEach(x=>x.classList.toggle('on',x.dataset.feel==i)); save(); };
+    dial.appendChild(b);
+  }
+  document.querySelectorAll('#verdict button').forEach(b=>{
+    if(state.verdict===b.dataset.v) b.classList.add('on');
+    b.onclick=()=>{ state.verdict=b.dataset.v; document.querySelectorAll('#verdict button').forEach(x=>x.classList.toggle('on',x.dataset.v===state.verdict)); save(); };
+  });
+  const sm=document.getElementById('summary'); sm.value=state.summary||'';
+  sm.oninput=()=>{ state.summary=sm.value; save(); };
+}
+
+document.getElementById('printBtn').onclick=()=>window.print();
+document.getElementById('resetBtn').onclick=()=>{
+  if(confirm('Clear all checks, notes, and your gut check? This cannot be undone.')){
+    state={checks:{},notes:{},open:{},feel:null,verdict:null,summary:''};
+    save(); render(); buildGut();
+    document.getElementById('summary').value='';
+    document.querySelectorAll('#dial button,#verdict button').forEach(b=>b.classList.remove('on'));
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+};
+
+(async function init(){ await load(); render(); buildGut(); })();
+</script>
+</body>
+</html>
